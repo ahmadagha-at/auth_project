@@ -1,0 +1,103 @@
+@accessToken = INSERT_ACCESS_TOKEN
+@refreshToken = INSERT_REFRESH_TOKEN
+
+
+### 1. Register a new user
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+  "username": "Ahmad",
+  "password": "password34"
+}
+
+
+### 2. Log in and receive a JWT
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "username": "Ahmad",
+  "password": "password34"
+}
+
+
+### 3. Access the authenticated user's dashboard
+GET http://localhost:8080/auth/Dashboard
+Authorization: Bearer {{accessToken}}
+
+
+### 4. View the authenticated user's profile
+GET http://localhost:8080/auth/profile
+Authorization: Bearer {{accessToken}}
+
+
+### 5. Access the admin settings
+GET http://localhost:8080/auth/admin-settings
+Authorization: Bearer {{accessToken}}
+
+
+### 6. Get all users
+GET http://localhost:8080/auth/users
+Authorization: Bearer {{accessToken}}
+
+
+### 7. Change a user's role to ADMIN
+# Replace 25 with an existing user ID
+PATCH http://localhost:8080/auth/users/27/role
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "role": "ROLE_ADMIN"
+}
+
+
+### 8. Change a user's role back to USER
+# Replace 25 with an existing user ID
+PATCH http://localhost:8080/auth/users/27/role
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "role": "ROLE_USER"
+}
+
+
+### 9. Delete a user
+# Replace 25 with an existing user ID
+DELETE http://localhost:8080/auth/users/27
+Authorization: Bearer {{accessToken}}
+
+### Test cors!
+OPTIONS http://localhost:8080/auth/register
+Origin: http://localhost:4040
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: Content-Type
+#response should be:
+#Access-Control-Allow-Origin: http://localhost:4040
+#Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+#Access-Control-Allow-Headers: Content-Type
+
+### refresh token
+POST http://localhost:8080/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### logout
+POST http://localhost:8080/auth/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### To test login with Google, open:
+#http://localhost:8080/oauth2/authorization/google
+#You will be redirected to Google to authenticate. After a successful login, Google redirects you to:
+#http://localhost:8080/login/oauth2/code/google
+#Spring Security processes the callback, and the application returns its own access token and refresh token.
+
