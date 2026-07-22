@@ -1,9 +1,11 @@
+@baseUrl = http://localhost:8080
 @accessToken = INSERT_ACCESS_TOKEN
 @refreshToken = INSERT_REFRESH_TOKEN
+@userId = 27
 
 
 ### 1. Register a new user
-POST http://localhost:8080/auth/register
+POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
@@ -13,7 +15,7 @@ Content-Type: application/json
 
 
 ### 2. Log in and receive a JWT
-POST http://localhost:8080/auth/login
+POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
@@ -23,28 +25,28 @@ Content-Type: application/json
 
 
 ### 3. Access the authenticated user's dashboard
-GET http://localhost:8080/auth/Dashboard
+GET {{baseUrl}}/auth/dashboard
 Authorization: Bearer {{accessToken}}
 
 
 ### 4. View the authenticated user's profile
-GET http://localhost:8080/auth/profile
+GET {{baseUrl}}/auth/profile
 Authorization: Bearer {{accessToken}}
 
 
 ### 5. Access the admin settings
-GET http://localhost:8080/auth/admin-settings
+GET {{baseUrl}}/auth/admin-settings
 Authorization: Bearer {{accessToken}}
 
 
 ### 6. Get all users
-GET http://localhost:8080/auth/users
+GET {{baseUrl}}/auth/users
 Authorization: Bearer {{accessToken}}
 
 
 ### 7. Change a user's role to ADMIN
-# Replace 25 with an existing user ID
-PATCH http://localhost:8080/auth/users/27/role
+# Set @userId to an existing user ID
+PATCH {{baseUrl}}/auth/users/{{userId}}/role
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
@@ -54,8 +56,8 @@ Content-Type: application/json
 
 
 ### 8. Change a user's role back to USER
-# Replace 25 with an existing user ID
-PATCH http://localhost:8080/auth/users/27/role
+# Set @userId to an existing user ID
+PATCH {{baseUrl}}/auth/users/{{userId}}/role
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
@@ -65,22 +67,22 @@ Content-Type: application/json
 
 
 ### 9. Delete a user
-# Replace 25 with an existing user ID
-DELETE http://localhost:8080/auth/users/27
+# Set @userId to an existing user ID
+DELETE {{baseUrl}}/auth/users/{{userId}}
 Authorization: Bearer {{accessToken}}
 
 ### Test cors!
-OPTIONS http://localhost:8080/auth/register
+OPTIONS {{baseUrl}}/auth/register
 Origin: http://localhost:4040
 Access-Control-Request-Method: POST
 Access-Control-Request-Headers: Content-Type
 #response should be:
 #Access-Control-Allow-Origin: http://localhost:4040
-#Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
-#Access-Control-Allow-Headers: Content-Type
+#Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+#Access-Control-Allow-Headers: Authorization, Content-Type
 
 ### refresh token
-POST http://localhost:8080/auth/refresh
+POST {{baseUrl}}/auth/refresh
 Content-Type: application/json
 
 {
@@ -88,7 +90,7 @@ Content-Type: application/json
 }
 
 ### logout
-POST http://localhost:8080/auth/logout
+POST {{baseUrl}}/auth/logout
 Content-Type: application/json
 
 {
@@ -100,4 +102,3 @@ Content-Type: application/json
 #You will be redirected to Google to authenticate. After a successful login, Google redirects you to:
 #http://localhost:8080/login/oauth2/code/google
 #Spring Security processes the callback, and the application returns its own access token and refresh token.
-

@@ -3,7 +3,9 @@ package at.ahmad.auth_project.service;
 import at.ahmad.auth_project.dto.RegisterAndLoginRequestDto;
 import at.ahmad.auth_project.entities.UserEntity;
 import at.ahmad.auth_project.enums.AuthProvider;
+import at.ahmad.auth_project.enums.Role;
 import at.ahmad.auth_project.exception.UserNotFoundException;
+import at.ahmad.auth_project.repo.RefreshTokenRepo;
 import at.ahmad.auth_project.repo.UserRepo;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -11,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +24,14 @@ import java.util.stream.Collectors;
 public class UserService implements UserDetailsService {
 
     private final UserRepo userRepo;
+    private final RefreshTokenRepo refreshTokenRepo;
 
-    public UserService(UserRepo userRepo){
+    public UserService(
+            UserRepo userRepo,
+            RefreshTokenRepo refreshTokenRepo
+    ) {
         this.userRepo = userRepo;
+        this.refreshTokenRepo = refreshTokenRepo;
     }
 
     public void register(RegisterAndLoginRequestDto userDto){
@@ -77,19 +85,24 @@ public class UserService implements UserDetailsService {
         return userRepo.findAll();
     }
 
+    @Transactional
     public void deleteUser(Long id) {
+        UserEntity user = userRepo.findById(id)
+                .orElseThrow(() ->
+                        new UserNotFoundException("User not found")
+                );
 
-        if (!userRepo.existsById(id)) {
-            throw new UserNotFoundException("User not found");
-        }
-
-        userRepo.deleteById(id);
+        refreshTokenRepo.deleteAllByUser(user);
+        refreshTokenRepo.flush();
+        userRepo.delete(user);
     }
 
-    public void updateRole(Long id, String role) {
+    public void updateRole(Long id, String roleName) {
+        Role role;
 
-        if (!role.equals("ROLE_USER") &&
-                !role.equals("ROLE_ADMIN")) {
+        try {
+            role = Role.valueOf(roleName);
+        } catch (IllegalArgumentException | NullPointerException exception) {
             throw new IllegalArgumentException("Invalid role");
         }
 
@@ -97,7 +110,13 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() ->
                         new UserNotFoundException("User not found")
                 );
-        user.setRole(role);
+        user.setRole(role.name());
+        user.setPermissions(
+                role.getPermissions()
+                        .stream()
+                        .map(Enum::name)
+                        .collect(Collectors.toSet())
+        );
         userRepo.save(user);
     }
 }

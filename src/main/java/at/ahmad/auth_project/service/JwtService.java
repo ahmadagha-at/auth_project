@@ -3,7 +3,6 @@ package at.ahmad.auth_project.service;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -17,22 +16,22 @@ import java.util.stream.Collectors;
 @Service
 public class JwtService {
 
-    private final String SECRET_KEY;
-    private final long EXPIRATION_TIME;
+    private final String secretKey;
+    private final long accessExpirationMs;
 
     public JwtService(
-            @Value("${jwt.acces-secret-key}")
-            String SECRET_KEY,
+            @Value("${jwt.access-secret-key}")
+            String secretKey,
 
             @Value("${jwt.access-expiration-ms}")
-            long EXPIRATION_TIME
+            long accessExpirationMs
     ) {
-        this.SECRET_KEY = SECRET_KEY;
-        this.EXPIRATION_TIME = EXPIRATION_TIME;
+        this.secretKey = secretKey;
+        this.accessExpirationMs = accessExpirationMs;
     }
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -47,7 +46,7 @@ public class JwtService {
                 .claim("permissions", permissions)
                 .issuedAt(new Date())
                 .expiration(new Date(
-                        System.currentTimeMillis() + EXPIRATION_TIME
+                        System.currentTimeMillis() + accessExpirationMs
                 ))
                 .signWith(getSigningKey())
                 .compact();

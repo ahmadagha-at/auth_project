@@ -38,6 +38,5 @@ server:
 
 jwt:
   refresh-expiration-ms: 604800000
-  access-expiration-ms: 3600000
-  acces-secret-key: ${JWT_ACCESS_SECRET_KEY}
-
+  access-expiration-ms: 900000
+  access-secret-key: ${JWT_ACCESS_SECRET_KEY}

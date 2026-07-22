@@ -1,7 +1,6 @@
 package at.ahmad.auth_project.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +13,6 @@ public class RegisterAndLoginRequestDto {
     String username;
 
     @NotBlank(message = "Password cannot be blank")
-    @Size(min = 6, max = 20, message = "Password must be between 6 and 20 characters")
+    @Size(min = 8, max = 72, message = "Password must be between 8 and 72 characters")
     String password;
 }

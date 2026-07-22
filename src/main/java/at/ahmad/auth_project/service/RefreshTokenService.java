@@ -55,7 +55,12 @@ public class RefreshTokenService {
     }
 
 
-    @Transactional(noRollbackFor = RefreshTokenException.class)
+    @Transactional(
+            noRollbackFor = {
+                    RefreshTokenException.class,
+                    CompromisedTokenException.class
+            }
+    )
     public RefreshToken verifyAndRotateRefreshToken(
             String refreshTokenValue
     ) {
@@ -69,6 +74,7 @@ public class RefreshTokenService {
         if (refreshToken.isUsed()) {
 
             refreshTokenRepository.deleteAllByFamilyId(refreshToken.getFamilyId());
+            refreshTokenRepository.flush();
 
             throw new CompromisedTokenException(
                     "Security Alert: Suspected Token Theft! You have been logged out everywhere."
@@ -91,6 +97,7 @@ public class RefreshTokenService {
         newToken.setUser(refreshToken.getUser());
         newToken.setFamilyId(refreshToken.getFamilyId());
         newToken.setExpiryDate(calculateExpiryDate());
+        newToken.setUsed(false);
 
         return refreshTokenRepository.save(newToken);
     }

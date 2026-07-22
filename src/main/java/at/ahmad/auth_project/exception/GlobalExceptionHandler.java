@@ -134,7 +134,7 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         return response(
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.UNAUTHORIZED,
                 exception.getMessage(),
                 request
         );
@@ -146,7 +146,7 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         return response(
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.UNAUTHORIZED,
                 exception.getMessage(),
                 request
         );

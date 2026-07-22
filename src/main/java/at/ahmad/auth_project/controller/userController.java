@@ -9,9 +9,7 @@ import at.ahmad.auth_project.dto.RegisterAndLoginRequestDto;
 import at.ahmad.auth_project.service.JwtService;
 import at.ahmad.auth_project.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,7 +27,7 @@ import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/auth")
-public class userController {
+public class UserController {
 
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
@@ -37,7 +35,7 @@ public class userController {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
 
-    public userController(
+    public UserController(
             UserService userService,
             AuthenticationManager authenticationManager,
             JwtService jwtService,
@@ -71,13 +69,6 @@ public class userController {
 
         Authentication authentication =
                 authenticationManager.authenticate(authenticationToken);
-
-         /* we use jwt
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            HttpSession session = request.getSession(true);
-            session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
-             */
 
         String role = authentication.getAuthorities()
                 .stream()
@@ -114,20 +105,6 @@ public class userController {
         );
 
         return ResponseEntity.ok(response);
-        /*
-        ResponseCookie cookie = ResponseCookie.from("jwt", jwtToken)
-                .httpOnly(true) // Prevents JavaScript access (helps protect against XSS)
-                .path("/")      //  Makes the cookie available for the entire application
-                .maxAge(24 * 60 * 60) // Sets the cookie lifetime to one day, in secondsGültigkeit z. B. 1 Tag in Sekunden
-                .sameSite("Strict") // Restricts cross-site requests(helps protect against CSRF)
-                .build();
-
-        // 3. Cookie in header
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .build();
-
-         */
     }
 
     @PostMapping("/refresh")
@@ -169,7 +146,7 @@ public class userController {
         );
     }
 
-    @GetMapping("/Dashboard")
+    @GetMapping("/dashboard")
     public ResponseEntity<?> dashboard() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 

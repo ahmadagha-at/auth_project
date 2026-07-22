@@ -2,7 +2,6 @@ package at.ahmad.auth_project.config;
 
 import at.ahmad.auth_project.service.JwtService;
 import io.jsonwebtoken.JwtException;
-import jakarta.persistence.SecondaryTable;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
